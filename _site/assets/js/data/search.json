@@ -1,0 +1,34 @@
+[
+  
+  {
+    "title": "Wacky XSS challenge with amazon (by bugpoc)",
+    "url": "/posts/Wacky-XSS-Challenge-by-amazon/",
+    "categories": "web",
+    "tags": "web",
+    "date": "2020-11-10 02:30:00 +0800",
+    
+
+
+
+
+
+    "snippet": "Hey, welcome to the write up for wacky XSS challenge. Throughout the write-up, i will try to not to limit myself just to the payloads or steps i specifically used but will also give you guys a front row seat to the thinking process that went behind successful completion of this challenge.The chal..."
+  },
+  
+  {
+    "title": "How to spot and exploit postMessage vulnerablities?",
+    "url": "/posts/How-to-spot-and-exploit-postMessage-vulnerablities/",
+    "categories": "web",
+    "tags": "web",
+    "date": "2020-08-30 02:30:00 +0800",
+    
+
+
+
+
+
+    "snippet": "Hey fam, i hope everyone is doing okay and able to use this time efficiently for self development and to self reflect. This corona virus pandemic has grown a bit tiring to be honest and gets the best of us.Here is my attempt at helping you understand a bug often overlooked when checking webapps o..."
+  }
+  
+]
+
