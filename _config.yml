@@ -24,7 +24,7 @@ description: >-                        # used by seo meta and the atom feed
   A blog dedicated to cyber security by karan bamal.
 
 # fill in the protocol & hostname for your site, e.g., 'https://username.github.io'
-url: ''
+url: 'https://abankalarm.github.io/'
 
 github:
   username: abankalarm             # change to your github username
