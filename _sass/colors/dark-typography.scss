@@ -4,9 +4,9 @@
 
 @mixin dark-scheme {
   /* framework */
-  --main-wrapper-bg: rgb(27, 27, 30);
+  --main-wrapper-bg: rgb(0, 0, 0);
   --body-bg: var(--main-wrapper-bg);
-  --topbar-wrapper-bg: rgb(39, 40, 43);
+  --topbar-wrapper-bg: rgb(0, 0, 0);
   --search-wrapper-bg: rgb(34, 34, 39);
   --search-icon-color: rgb(100, 102, 105);
   --input-focus-border-color: rgb(112, 114, 115);
@@ -34,7 +34,8 @@
 
   /* Sidebar */
   --nav-cursor-color: rgb(183, 182, 182);
-  --sidebar-bg: radial-gradient(circle, #242424 0%, #1d1f27 100%);
+  --sidebar-bg: rgb(0,0,0)
+  /*--sidebar-bg: radial-gradient(circle, #242424 0%, #1d1f27 100%);*/
 
   /* Top Bar */
   --topbar-text-color: var(--text-color);
