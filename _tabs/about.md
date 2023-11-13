@@ -5,7 +5,7 @@ icon: fas fa-info
 order: 4
 ---
 
-I'm Karan Bamal, a security researcher a penchant for offensive security.
+I'm Karan Bamal, a security researcher with a penchant for offensive security.
 
 For a closer look at my professional profile, visit my LinkedIn: https://www.linkedin.com/in/karanbamal/
 
