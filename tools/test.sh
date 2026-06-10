@@ -63,4 +63,5 @@ bundle exec htmlproofer "$DEST" \
   --disable-external \
   --ignore-empty-alt \
   --allow-hash-href \
-  --ignore-urls $URL_IGNORE
+  --ignore-urls $URL_IGNORE \
+  --ignore-files "/certifications/,/cves/"

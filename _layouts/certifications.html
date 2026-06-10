@@ -193,3 +193,12 @@ layout: default
 
   {% include panel.html %}
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('img[data-src]').forEach(function (img) {
+      img.src = img.getAttribute('data-src');
+      img.removeAttribute('data-src');
+    });
+  });
+</script>
