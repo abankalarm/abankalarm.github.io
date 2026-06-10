@@ -1,0 +1,233 @@
+---
+layout: default
+---
+
+{% assign cves = site.data.cves %}
+
+<style>
+/* ========================================================
+   CVE PAGE — Design E: Minimal flat cards
+   ======================================================== */
+.cve-page h1.dynamic-title { margin-bottom: 0.3rem; }
+
+/* severity colour tokens */
+.sev-critical { --sev-color: #e53e3e; }
+.sev-high     { --sev-color: #dd6b20; }
+.sev-medium   { --sev-color: #d69e2e; }
+.sev-low      { --sev-color: #38a169; }
+
+/* pill badge */
+.sev-pill {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 0.18em 0.6em;
+  border-radius: 999px;
+  background: var(--sev-color, #888);
+  color: #fff;
+  line-height: 1.6;
+  flex-shrink: 0;
+}
+.sev-medium .sev-pill { color: #1a1a1a; }
+
+/* action buttons */
+.cve-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 0.3em 0.75em;
+  border-radius: 5px;
+  border: 1.5px solid;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.btn-nvd {
+  border-color: rgba(41,128,185,0.55);
+  color: #2980b9;
+}
+.btn-nvd:hover { background: #2980b9; color: #fff !important; border-color: #2980b9; }
+.btn-msrc {
+  border-color: rgba(0,120,212,0.55);
+  color: #0078d4;
+}
+.btn-msrc:hover { background: #0078d4; color: #fff !important; border-color: #0078d4; }
+.btn-writeup {
+  border-color: rgba(128,128,128,0.3);
+  color: var(--text-muted-color, #888);
+}
+.btn-writeup:hover {
+  border-color: var(--link-color, #1e90ff);
+  color: var(--link-color, #1e90ff) !important;
+}
+
+.cve-summary {
+  font-size: 0.8rem;
+  color: var(--text-muted-color, #888);
+  margin: 0.5rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3em;
+}
+.cve-summary .s-count {
+  font-weight: 700;
+  color: var(--text-color);
+}
+.cve-summary .s-high   { font-weight: 700; color: #dd6b20; }
+.cve-summary .s-medium { font-weight: 700; color: #d69e2e; }
+.cve-summary .s-low    { font-weight: 700; color: #38a169; }
+.cve-summary .s-dot {
+  color: var(--card-border-color, rgba(128,128,128,0.4));
+  margin: 0 0.1em;
+}
+
+/* card stack */
+.cve-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-top: 1.5rem;
+}
+
+.cve-card {
+  background: var(--card-bg, transparent);
+  border-radius: 10px;
+  padding: 1.2rem 1.4rem;
+  border: 1px solid var(--card-border-color, rgba(128,128,128,0.18));
+  box-shadow: 0 2px 8px 0 var(--card-box-shadow, rgba(0,0,0,0.05));
+  transition: box-shadow 0.15s, border-color 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.cve-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--sev-color, #888);
+  border-radius: 10px 0 0 10px;
+}
+.cve-card:hover {
+  box-shadow: 0 6px 20px 0 var(--card-box-shadow, rgba(0,0,0,0.1));
+  border-color: var(--sev-color, rgba(128,128,128,0.3));
+}
+
+.e-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+.e-cve-id {
+  font-family: monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted-color, #888);
+  letter-spacing: 0.04em;
+}
+.e-title {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: var(--text-color);
+  line-height: 1.3;
+  margin-bottom: 0.4rem;
+}
+.e-desc {
+  font-size: 0.84rem;
+  color: var(--text-muted-color, #888);
+  line-height: 1.6;
+  margin-bottom: 0.85rem;
+}
+.e-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--card-border-color, rgba(128,128,128,0.15));
+}
+.e-meta {
+  font-size: 0.75rem;
+  color: var(--text-muted-color, #888);
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+.e-meta span { display: inline-flex; align-items: center; gap: 0.3em; }
+.e-links { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+</style>
+
+<div class="row cve-page">
+  <div class="col-12 col-lg-11 col-xl-8">
+    <div id="page" class="post pb-5 pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4 mb-md-4">
+
+      {% assign count_total  = cves | size %}
+      {% assign count_high   = 0 %}
+      {% assign count_medium = 0 %}
+      {% assign count_low    = 0 %}
+      {% for cve in cves %}
+        {% if cve.severity == "HIGH"   %}{% assign count_high   = count_high   | plus: 1 %}{% endif %}
+        {% if cve.severity == "MEDIUM" %}{% assign count_medium = count_medium | plus: 1 %}{% endif %}
+        {% if cve.severity == "LOW"    %}{% assign count_low    = count_low    | plus: 1 %}{% endif %}
+      {% endfor %}
+
+      <h1 class="dynamic-title">{{ page.title }}</h1>
+      <p style="color:var(--text-muted-color,#888);font-size:0.875rem;margin-top:0.2rem;">
+        CVEs attributed to Karan Bamal. Each entry links to the NVD advisory and, where available, a full writeup.
+      </p>
+
+      <div class="cve-summary">
+        <span class="s-count">{{ count_total }} CVEs</span>
+        <span class="s-dot">&middot;</span>
+        {% if count_high > 0 %}<span class="s-high">{{ count_high }} high</span><span class="s-dot">&middot;</span>{% endif %}
+        {% if count_medium > 0 %}<span class="s-medium">{{ count_medium }} medium</span><span class="s-dot">&middot;</span>{% endif %}
+        {% if count_low > 0 %}<span class="s-low">{{ count_low }} low</span><span class="s-dot">&middot;</span>{% endif %}
+        <span>Microsoft &middot; Samsung &middot; Logitech &middot; TruffleHog &middot; Malwarebytes &middot; ReportLab</span>
+      </div>
+
+      <div class="cve-stack">
+        {% for cve in cves %}
+        {% assign sev_lc = cve.severity | downcase %}
+        <div class="cve-card sev-{{ sev_lc }}">
+          <div class="e-eyebrow">
+            <span class="e-cve-id">{{ cve.id }}</span>
+            <span class="sev-pill">{{ cve.severity }}</span>
+          </div>
+          <div class="e-title">{{ cve.title }}</div>
+          <div class="e-desc">{{ cve.description }}</div>
+          <div class="e-footer">
+            <div class="e-meta">
+              <span><i class="fas fa-calendar-alt"></i>{{ cve.year }}</span>
+              <span><i class="fas fa-desktop"></i>{{ cve.product }}</span>
+            </div>
+            <div class="e-links">
+              <a href="{{ cve.nvd_url }}" target="_blank" rel="noopener" class="cve-btn btn-nvd">
+                <i class="fas fa-external-link-alt"></i> NVD
+              </a>
+              {% if cve.msrc_url and cve.msrc_url != "" %}
+              <a href="{{ cve.msrc_url }}" target="_blank" rel="noopener" class="cve-btn btn-msrc">
+                <i class="fas fa-shield-alt"></i> MSRC
+              </a>
+              {% endif %}
+              {% if cve.writeup_url and cve.writeup_url != "" %}
+              <a href="{{ cve.writeup_url }}" target="_blank" rel="noopener" class="cve-btn btn-writeup">
+                <i class="fas fa-file-alt"></i> Writeup
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+    </div><!-- #page -->
+  </div><!-- .col-12 -->
+
+  {% include panel.html %}
+</div>

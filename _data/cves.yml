@@ -1,0 +1,124 @@
+# CVE data for the CVEs page.
+# severity: CRITICAL | HIGH | MEDIUM | LOW  — sourced from NVD primary score
+# cvss: CVSS v3.1 base score (NVD primary)
+# writeup_url / msrc_url: leave empty string if not applicable
+
+- id: CVE-2024-43616
+  title: Microsoft Office Remote Code Execution Vulnerability
+  severity: HIGH
+  cvss: "7.8"
+  year: 2024
+  product: Microsoft Office 2013 – 2024, Microsoft 365 Apps (Enterprise)
+  description: >
+    An untrusted search path (CWE-426) vulnerability in Microsoft Office allows a local
+    attacker with no required privileges to execute arbitrary code. Affects virtually all
+    versions of Microsoft Office going back over a decade — Microsoft 365 Apps for
+    Enterprise, Office LTSC 2024, Office LTSC 2021, Office 2019, Office 2016, and
+    Office 2013.
+  nvd_url: https://nvd.nist.gov/vuln/detail/CVE-2024-43616
+  msrc_url: https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-43616
+  writeup_url: ""
+
+- id: CVE-2024-43379
+  title: Blind Server-Side Request Forgery (SSRF) in TruffleHog Secrets Scanner
+  severity: LOW
+  cvss: "3.1"
+  year: 2024
+  product: TruffleHog < v3.81.9
+  description: >
+    Certain TruffleHog detectors capture an endpoint from scanned data and issue a GET
+    request to it during verification. Combined with Go's HTTP library automatically
+    following redirects, an attacker who can inject a payload into scanned data can
+    trigger blind SSRF against internal services — potentially reaching systems that
+    straddle internal networks. Patched in v3.81.9.
+  nvd_url: https://nvd.nist.gov/vuln/detail/CVE-2024-43379
+  msrc_url: ""
+  writeup_url: https://trufflesecurity.com/blog/contributor-spotlight-karan-bamal
+
+- id: CVE-2024-31954
+  title: Local Privilege Escalation via DLL Hijacking in Samsung Portable SSD T5 Installer
+  severity: HIGH
+  cvss: "7.3"
+  year: 2024
+  product: Samsung Portable SSD T5 PC Software v1.6.10 (Windows)
+  description: >
+    An issue was discovered in the installer in Samsung Portable SSD for T5 1.6.10 on
+    Windows. Because it is possible to tamper with the directory and DLL files used during
+    the installation process, an attacker can escalate privileges through arbitrary code
+    execution. An attacker must already have user privileges to exploit this vulnerability.
+  nvd_url: https://nvd.nist.gov/vuln/detail/CVE-2024-31954
+  msrc_url: ""
+  writeup_url: ""
+
+- id: CVE-2023-28605
+  title: Local Privilege Escalation in Malwarebytes
+  severity: HIGH
+  cvss: ""
+  year: 2023
+  product: Malwarebytes (Windows)
+  description: >
+    A privilege escalation vulnerability in Malwarebytes for Windows allows a local
+    attacker to gain elevated system privileges. The CVE is currently reserved and not
+    yet public on NVD; details will be updated upon coordinated disclosure.
+  nvd_url: https://nvd.nist.gov/vuln/detail/CVE-2023-28605
+  msrc_url: ""
+  writeup_url: ""
+
+- id: CVE-2022-25154
+  title: Local Privilege Escalation via DLL Hijacking in Samsung Portable SSD T5
+  severity: HIGH
+  cvss: "7.3"
+  year: 2022
+  product: Samsung Portable SSD T5 PC Software < v1.6.9 (Windows 7/10/11)
+  description: >
+    A DLL hijacking vulnerability in Samsung Portable SSD T5 PC software before v1.6.9
+    could allow a local attacker to escalate privileges. An attacker must already have
+    user privileges on Windows 7, 10, or 11 to exploit this vulnerability.
+  nvd_url: https://nvd.nist.gov/vuln/detail/CVE-2022-25154
+  msrc_url: ""
+  writeup_url: ""
+
+- id: CVE-2022-0916
+  title: OAuth 2.0 CSRF in Logitech Options
+  severity: HIGH
+  cvss: "8.8"
+  year: 2022
+  product: Logitech Options < v9.60.87 (Windows)
+  description: >
+    The OAuth 2.0 state parameter in Logitech Options is not properly validated,
+    leaving the authentication and authorization flow vulnerable to CSRF attacks during
+    authentication and authorization operations. Can be chained with CVE-2022-0915
+    for full remote code execution.
+  nvd_url: https://nvd.nist.gov/vuln/detail/CVE-2022-0916
+  msrc_url: ""
+  writeup_url: ""
+
+- id: CVE-2022-0915
+  title: TOCTOU Race Condition Local Privilege Escalation in Logitech Sync
+  severity: HIGH
+  cvss: "7.0"
+  year: 2022
+  product: Logitech Sync < v2.4.574 (Windows)
+  description: >
+    A Time-of-check Time-of-use (TOCTOU) race condition in Logitech Sync for Windows
+    prior to v2.4.574. Successful exploitation may escalate permissions to the system
+    user. Chained with CVE-2022-0916, a network-based CSRF pivots into full local
+    privilege escalation.
+  nvd_url: https://nvd.nist.gov/vuln/detail/CVE-2022-0915
+  msrc_url: ""
+  writeup_url: ""
+
+- id: CVE-2020-28463
+  title: Server-Side Request Forgery (SSRF) via img Tags in Python ReportLab
+  severity: MEDIUM
+  cvss: "6.5"
+  year: 2021
+  product: ReportLab (all versions, Python)
+  description: >
+    All versions of package reportlab are vulnerable to Server-side Request Forgery (SSRF)
+    via img tags. By injecting a crafted img src into text being converted to PDF, an
+    attacker can cause the server to issue arbitrary HTTP requests to internal or
+    attacker-controlled endpoints, leaking internal infrastructure details.
+  nvd_url: https://nvd.nist.gov/vuln/detail/CVE-2020-28463
+  msrc_url: ""
+  writeup_url: ""

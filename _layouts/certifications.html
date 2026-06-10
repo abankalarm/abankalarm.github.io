@@ -1,0 +1,206 @@
+---
+layout: default
+---
+
+{% assign certs = site.data.certifications %}
+
+<style>
+/* category colours */
+.cat-offensive { --cc: #e53e3e; }
+.cat-cloud     { --cc: #3182ce; }
+.cat-research  { --cc: #805ad5; }
+.cat-internals { --cc: #dd6b20; }
+
+.cert-page h1.dynamic-title { margin-bottom: 0.2rem; }
+
+/* ── Credential panel stack ── */
+.cert-panels {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.cert-panel {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--card-border-color, rgba(128,128,128,0.18));
+  border-left: 3px solid var(--cc, #888);
+  border-radius: 0 10px 10px 0;
+  overflow: hidden;
+  background: var(--card-bg, transparent);
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.05);
+  transition: box-shadow 0.15s, transform 0.12s;
+}
+.cert-panel:hover {
+  box-shadow: 0 4px 16px 0 rgba(0,0,0,0.12);
+  transform: translateX(3px);
+}
+
+/* ── Badge column ── */
+.panel-badge {
+  width: 140px;
+  min-width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card-header-bg, rgba(128,128,128,0.04));
+  border-right: 1px solid var(--card-border-color, rgba(128,128,128,0.1));
+  padding: 1.5rem 0;
+}
+.panel-badge img {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  display: block;
+}
+.panel-badge-placeholder {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: rgba(128,128,128,0.08);
+  border: 2px solid var(--cc, #888);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cc, #888);
+  opacity: 0.6;
+  font-size: 1.75rem;
+}
+
+/* ── Content body ── */
+.panel-body {
+  flex: 1;
+  padding: 0.95rem 1.2rem;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+}
+.panel-eyebrow {
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cc, #888);
+  margin-bottom: 0.05rem;
+}
+.panel-name {
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: var(--heading-color, var(--text-color));
+  line-height: 1.25;
+}
+.panel-instructor {
+  font-size: 0.76rem;
+  color: var(--text-muted-color, #888);
+  font-style: italic;
+}
+.panel-desc {
+  font-size: 0.79rem;
+  color: var(--text-muted-color, #888);
+  line-height: 1.6;
+  margin-top: 0.4rem;
+}
+
+/* ── Credential footer ── */
+.panel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.65rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--card-border-color, rgba(128,128,128,0.12));
+  flex-wrap: wrap;
+}
+.panel-cred-id {
+  font-family: 'SFMono-Regular', 'Consolas', monospace;
+  font-size: 0.68rem;
+  color: var(--text-muted-color, #888);
+  letter-spacing: 0.03em;
+  opacity: 0.75;
+}
+.panel-verify-btn {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cc, #888);
+  border: 1px solid var(--cc, #888);
+  border-radius: 4px;
+  padding: 0.2em 0.75em;
+  text-decoration: none;
+  transition: background 0.12s, color 0.12s;
+  white-space: nowrap;
+}
+.panel-verify-btn:hover {
+  background: var(--cc, #888);
+  color: #fff;
+  text-decoration: none;
+}
+</style>
+
+<div class="row cert-page">
+  <div class="col-12 col-lg-11 col-xl-8">
+    <div id="page" class="post pb-5 pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4 mb-md-4">
+
+      <h1 class="dynamic-title">{{ page.title }}</h1>
+      <p style="color:var(--text-muted-color,#888);font-size:0.875rem;margin-top:0.2rem;margin-bottom:0;">
+        Training and certifications in offensive security, cloud penetration testing, hypervisor research, and Windows internals.
+      </p>
+
+      <div class="cert-panels">
+        {% for cert in certs %}
+        <div class="cert-panel cat-{{ cert.category }}">
+
+          <!-- Badge / placeholder -->
+          <div class="panel-badge">
+            {% if cert.badge_img and cert.badge_img != "" %}
+              <img data-badge-src="{{ cert.badge_img }}" width="90" height="90" alt="{{ cert.acronym | default: cert.name }} badge" style="display:none;">
+            {% else %}
+              <div class="panel-badge-placeholder">
+                <i class="fas fa-shield-alt"></i>
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Content -->
+          <div class="panel-body">
+            <div class="panel-eyebrow">{{ cert.issuer }}{% if cert.course and cert.course != "" %} &middot; {{ cert.course }}{% endif %}</div>
+            <div class="panel-name">{% if cert.acronym and cert.acronym != "" %}{{ cert.acronym }} &mdash; {% endif %}{{ cert.name }}</div>
+            {% if cert.instructor and cert.instructor != "" %}
+              <div class="panel-instructor">{{ cert.instructor }}</div>
+            {% endif %}
+            <div class="panel-desc">{{ cert.description }}</div>
+
+            {% if cert.credential_id and cert.credential_id != "" %}
+            <div class="panel-footer">
+              <span class="panel-cred-id">{{ cert.credential_id }}</span>
+              {% if cert.credential_url and cert.credential_url != "" %}
+                <a class="panel-verify-btn" href="{{ cert.credential_url }}" target="_blank" rel="noopener">Verify</a>
+              {% endif %}
+            </div>
+            {% endif %}
+          </div>
+
+        </div>
+        {% endfor %}
+      </div>
+
+    </div><!-- #page -->
+  </div><!-- .col-12 -->
+
+  {% include panel.html %}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const badgeImages = document.querySelectorAll('img[data-badge-src]');
+    badgeImages.forEach(img => {
+      img.src = img.getAttribute('data-badge-src');
+      img.style.display = 'block';
+      img.removeAttribute('data-badge-src');
+    });
+  });
+</script>

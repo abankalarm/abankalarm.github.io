@@ -1,0 +1,9 @@
+# Bug Bounty Program Status
+active: true
+total_reports: 0  # Update as needed
+
+# List any major programs (optional)
+programs:
+  - name: ""
+    status: ""
+    url: ""

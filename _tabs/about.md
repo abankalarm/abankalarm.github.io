@@ -10,9 +10,10 @@ I'm Karan Bamal, a security researcher with a penchant for offensive security.
 For a closer look at my professional profile, visit my LinkedIn: https://www.linkedin.com/in/karanbamal/
 
 Certifications:
-<b>
-OSCP
-</b>
+- **Offensive Security Certified Professional (OSCP)** — Offensive Security
+- **GIAC Certified Cloud Penetration Tester (GCPN)** — SANS SEC588
+- **Hypervisor Vulnerability Research** — Zero Day Engineering (Alissa Esage)
+- **Windows Internals** — Pavel Yosifovich, trainsec
 
 refer the <b>CVE</b> section for a list of CVE's that are attributed to me.
 

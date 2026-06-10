@@ -1,0 +1,72 @@
+# Certifications data
+# badge_img: path under /assets/img/certs/ — empty if no badge
+# credential_url: Credly or issuer verification link
+# credential_id: visible ID string
+
+- name: GIAC Cloud Penetration Tester
+  acronym: GCPN
+  issuer: Global Information Assurance Certification (GIAC)
+  course: SANS SEC588
+  instructor: Moses Frost, Aaron Cure
+  category: cloud
+  badge_img: /assets/img/certs/gcpn.png
+  credential_url: https://www.credly.com/badges/a9e63832-b97e-4687-b607-a3c48e3218d6/public_url
+  credential_id: a9e63832-b97e-4687-b607-a3c48e3218d6
+  description: >
+    GCPN validates the ability to conduct adversarial assessments against cloud-native
+    infrastructure. SEC588 goes beyond checkbox compliance — covering IAM privilege
+    escalation, cross-account pivoting, serverless exploitation, container escapes,
+    and CI/CD pipeline abuse across AWS, Azure, and GCP. The course, led by Moses Frost
+    and Aaron Cure, takes a threat-actor perspective throughout: environment mapping and
+    service discovery, cloud-native attack paths, and targeting the abstractions that
+    organisations rely on but rarely harden.
+
+- name: Offensive Security Certified Professional
+  acronym: OSCP
+  issuer: Offensive Security
+  course: ""
+  instructor: ""
+  category: offensive
+  badge_img: /assets/img/certs/oscp.png
+  credential_url: https://www.credly.com/badges/f0208112-dcba-4d23-9a66-156caf52b0d0/linked_in
+  credential_id: f0208112-dcba-4d23-9a66-156caf52b0d0
+  description: >
+    The OSCP is the industry benchmark for hands-on offensive security. Candidates
+    are dropped into an isolated network and have 24 hours to compromise a set of
+    machines through any means necessary — no hints, no walkthroughs. Passing
+    requires demonstrating persistence, methodical enumeration, and the ability to
+    chain primitives under time pressure. An OSCP has proven they can think
+    offensively in conditions that mirror real engagements.
+
+- name: Hypervisor Vulnerability Research
+  acronym: ""
+  issuer: Zero Day Engineering
+  course: ""
+  instructor: Alissa Esage
+  category: research
+  badge_img: https://zerodayengineering.com/images/logo-large-black.png
+  credential_url: ""
+  credential_id: ""
+  description: >
+    Focused on finding and exploiting vulnerabilities in hypervisors and virtualisation
+    software — one of the narrowest and most technically demanding attack surfaces in
+    offensive security. Taught by Alissa Esage, whose research has produced multiple
+    VM-escape and hypervisor CVEs. The course covers hypervisor internals, attack surface
+    enumeration, and hands-on exploitation of virtualisation vulnerabilities.
+
+- name: Windows Internals
+  acronym: ""
+  issuer: trainsec
+  course: ""
+  instructor: Pavel Yosifovich
+  category: internals
+  badge_img: https://trainsec.net/wp-content/uploads/2024/07/Windows-Security-Researcher-Badge-1.png
+  credential_url: ""
+  credential_id: ""
+  description: >
+    A deep technical course on the Windows kernel — object model, process and thread
+    management, virtual memory internals, I/O subsystem, and synchronisation primitives.
+    Taught by Pavel Yosifovich, co-author of the definitive Windows Internals books.
+    This is foundational knowledge for anyone working at the exploit development or
+    kernel vulnerability research level: understanding what the OS is doing underneath
+    gives you a precise map of where it can be made to do something else.

