@@ -157,7 +157,7 @@ layout: default
           <!-- Badge / placeholder -->
           <div class="panel-badge">
             {% if cert.badge_img and cert.badge_img != "" %}
-              <img data-badge-src="{{ cert.badge_img }}" width="90" height="90" alt="{{ cert.acronym | default: cert.name }} badge" style="display:none;">
+              <img src="{{ cert.badge_img }}" width="90" height="90" alt="{{ cert.acronym | default: cert.name }} badge">
             {% else %}
               <div class="panel-badge-placeholder">
                 <i class="fas fa-shield-alt"></i>
@@ -193,14 +193,3 @@ layout: default
 
   {% include panel.html %}
 </div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const badgeImages = document.querySelectorAll('img[data-badge-src]');
-    badgeImages.forEach(img => {
-      img.src = img.getAttribute('data-badge-src');
-      img.style.display = 'block';
-      img.removeAttribute('data-badge-src');
-    });
-  });
-</script>
